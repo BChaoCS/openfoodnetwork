@@ -76,7 +76,7 @@ Spree::Product.class_eval do
     distributor = distributor.respond_to?(:id) ? distributor.id : distributor.to_i
 
     with_product_distributions_outer.with_order_cycles_outer.
-      where('product_distributions.distributor_id = ? OR (o_exchanges.incoming = ? AND o_exchanges.receiver_id = ?)', distributor, false, distributor).
+      where('(o_exchanges.incoming = ? AND o_exchanges.receiver_id = ?)', false, distributor).
       select('distinct spree_products.*')
   }
 
@@ -236,7 +236,7 @@ Spree::Product.class_eval do
   end
 
   def touch_distributors
-    Enterprise.distributing_products(self).each(&:touch)
+    Enterprise.distributing_products(self.id).each(&:touch)
   end
 
   def add_primary_taxon_to_taxons
