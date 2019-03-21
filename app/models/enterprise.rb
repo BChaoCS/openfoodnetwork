@@ -140,12 +140,12 @@ class Enterprise < ActiveRecord::Base
   scope :distributing_products, lambda { |products|
     # TODO: remove this when we pull out product distributions
     pds = joins("INNER JOIN product_distributions ON product_distributions.distributor_id = enterprises.id").
-      where("product_distributions.product_id IN (?)", products).select('DISTINCT enterprises.id')
+      where("product_distributions.product_id IN (?)", products.pluck(:id)).select('DISTINCT enterprises.id')
 
     exs = joins("INNER JOIN exchanges ON (exchanges.receiver_id = enterprises.id AND exchanges.incoming = 'f')").
       joins('INNER JOIN exchange_variants ON (exchange_variants.exchange_id = exchanges.id)').
       joins('INNER JOIN spree_variants ON (spree_variants.id = exchange_variants.variant_id)').
-      where('spree_variants.product_id IN (?)', products).select('DISTINCT enterprises.id')
+      where('spree_variants.product_id IN (?)', products.pluck(:id)).select('DISTINCT enterprises.id')
 
     where(id: pds | exs)
   }
@@ -362,7 +362,7 @@ class Enterprise < ActiveRecord::Base
   end
 
   def ensure_owner_is_manager
-    users << owner unless users.include?(owner)
+    #users << owner unless users.include?(owner)
   end
 
   def enforce_ownership_limit
